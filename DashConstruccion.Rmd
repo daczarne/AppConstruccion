@@ -4,7 +4,7 @@ output:
   flexdashboard::flex_dashboard:
     orientation: rows
     vertical_layout: fill
-    source_code: "https://github.com/daczarne/UnaImagen/tree/master/DataBases/Construccion"
+    source_code: "https://github.com/UnaImagen/AppConstruccion"
 runtime: shiny
 ---
 
@@ -109,7 +109,7 @@ industria <- reactive({
 Column {.sidebar}
 -----------------------------------------------------------------------
 
-Cantidad de permisos de construcción emitidos por la IMM. Los datos se muestran con apertura por Tipo de permiso y destino del inmueble. El Tipo IPH equivale a Incorporación a Propiedad Horizontal. Fuente: Instituo Nacional de Estadística.
+Cantidad de permisos de construcción emitidos por la IMM. Los datos se muestran con apertura por Tipo de permiso y destino del inmueble. El Tipo IPH equivale a Incorporación a Propiedad Horizontal.
 
 ```{r}
 selectInput(
@@ -119,6 +119,8 @@ selectInput(
    choices = sort(unique(construccion$year), decreasing = TRUE)
 )
 ```
+
+Fuente: Instituto Nacional de Estadística.
 
 Row {data-width=100}
 -----------------------------------------------------------------------
@@ -191,7 +193,6 @@ renderValueBox({
 })
 ```
 
-
 Row {data-width=450}
 -----------------------------------------------------------------------
 
@@ -244,4 +245,3 @@ renderPlotly({
    )
 })
 ```
-
