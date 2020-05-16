@@ -4,17 +4,15 @@ output:
   flexdashboard::flex_dashboard:
     orientation: rows
     vertical_layout: fill
-    source_code: "https://github.com/UnaImagen/AppConstruccion"
+    source_code: "https://github.com/daczarne/AppConstruccion"
 runtime: shiny
 ---
 
 <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.0/css/all.css">
 
 ```{r global, include=FALSE}
-library(flexdashboard, quietly = TRUE)
-library(plotly, quietly = TRUE)
-library(shiny, quietly = TRUE)
 construccion <- readr::read_rds(path = here::here("construccion.rds"))
+library(magrittr, quietly = TRUE)
 ```
 
 ```{r variables_globales}
@@ -33,77 +31,76 @@ valuebox_icon_otros <- "fas fa-building"
 
 ```{r reactive_functions}
 ## Devuelve la cantidad total de permisos en el año seleccionado por el usuario
-total <- reactive({
-   construccion %>% 
+total <- shiny::reactive({
+   construccion %>%
       dplyr::group_by(
          year
-      ) %>% 
+      ) %>%
       dplyr::summarise(
-         permisos = sum(permisos)
-      ) %>% 
+         permisos = base::sum(permisos, na.rm = TRUE)
+      ) %>%
       dplyr::filter(
          year == input$year
-      ) %>% 
+      ) %>%
       dplyr::pull()
 })
 
 ## Devuelve la cantidad de permisos con destino vivienda en el año seleccionado por el usuario
-vivienda <- reactive({
-   construccion %>% 
+vivienda <- shiny::reactive({
+   construccion %>%
       dplyr::group_by(
          year,
          destino
-      ) %>% 
+      ) %>%
       dplyr::summarise(
-         permisos = sum(permisos)
-      ) %>% 
+         permisos = base::sum(permisos, na.rm = TRUE)
+      ) %>%
       dplyr::filter(
          year == input$year,
          destino == "Vivienda"
-      ) %>% 
+      ) %>%
       dplyr::pull(
          permisos
       )
 })
 
 ## Devuelve la cantidad de permisos con destino comercio en el año seleccionado por el usuario
-comercio <- reactive({
-   construccion %>% 
+comercio <- shiny::reactive({
+   construccion %>%
       dplyr::group_by(
          year,
          destino
-      ) %>% 
+      ) %>%
       dplyr::summarise(
-         permisos = sum(permisos)
-      ) %>% 
+         permisos = base::sum(permisos, na.rm = TRUE)
+      ) %>%
       dplyr::filter(
          year == input$year,
          destino == "Comercio"
-      ) %>% 
+      ) %>%
       dplyr::pull(
          permisos
       )
 })
 
 ## Devuelve la cantidad de permisos con destino industria en el año seleccionado por el usuario
-industria <- reactive({
-   construccion %>% 
+industria <- shiny::reactive({
+   construccion %>%
       dplyr::group_by(
          year,
          destino
-      ) %>% 
+      ) %>%
       dplyr::summarise(
-         permisos = sum(permisos)
-      ) %>% 
+         permisos = base::sum(permisos, na.rm = TRUE)
+      ) %>%
       dplyr::filter(
          year == input$year,
          destino == "Industria"
-      ) %>% 
+      ) %>%
       dplyr::pull(
          permisos
       )
 })
-
 ```
 
 Column {.sidebar}
@@ -112,11 +109,11 @@ Column {.sidebar}
 Cantidad de permisos de construcción emitidos por la IMM. Los datos se muestran con apertura por Tipo de permiso y destino del inmueble. El Tipo IPH equivale a Incorporación a Propiedad Horizontal.
 
 ```{r}
-selectInput(
+shiny::selectInput(
    inputId = "year",
    label = "Seleccione un año",
-   selected = max(construccion$year),
-   choices = sort(unique(construccion$year), decreasing = TRUE)
+   selected = base::max(construccion$year),
+   choices = base::sort(base::unique(construccion$year), decreasing = TRUE)
 )
 ```
 
@@ -128,8 +125,8 @@ Row {data-width=100}
 ### Total de permisos
 
 ```{r}
-renderValueBox({
-   valueBox(
+flexdashboard::renderValueBox({
+   flexdashboard::valueBox(
       value = formattable::comma(
          x = total(),
          digits = digits_permisos,
@@ -145,8 +142,8 @@ renderValueBox({
 ### Vivienda
 
 ```{r}
-renderValueBox({
-   valueBox(
+flexdashboard::renderValueBox({
+   flexdashboard::valueBox(
       value = formattable::comma(
          x = vivienda(),
          digits = digits_permisos,
@@ -162,8 +159,8 @@ renderValueBox({
 ### Comercio e Industria
 
 ```{r}
-renderValueBox({
-   valueBox(
+flexdashboard::renderValueBox({
+   flexdashboard::valueBox(
       value = formattable::comma(
          x = comercio() + industria(),
          digits = digits_permisos,
@@ -179,8 +176,8 @@ renderValueBox({
 ### Otros/Varios
 
 ```{r}
-renderValueBox({
-   valueBox(
+flexdashboard::renderValueBox({
+   flexdashboard::valueBox(
       value = formattable::comma(
          x = total() - vivienda() - comercio() - industria(),
          digits = digits_permisos,
@@ -199,13 +196,13 @@ Row {data-width=450}
 ### Permisos por tipo y destino
 
 ```{r}
-renderPlotly({
+plotly::renderPlotly({
    construccion %>% 
    dplyr::filter(
       year == input$year
    ) %>% 
    dplyr::mutate(
-      proporcion = permisos / sum(permisos) * 100
+      proporcion = permisos / base::sum(permisos, na.rm = TRUE) * 100
    ) %>% 
    plotly::plot_ly() %>% 
    plotly::add_trace(
@@ -213,10 +210,10 @@ renderPlotly({
       y = ~tipo,
       type = "scatter",
       mode = "markers",
-      marker = list(
+      marker = base::list(
          size = ~proporcion
       ),
-      hovertemplate = ~paste0(
+      hovertemplate = ~base::paste0(
          "<b>Tipo</b>: %{y}",
          "<br>",
          "<b>Destino</b>: %{x}",
@@ -232,10 +229,10 @@ renderPlotly({
       name = " "
    ) %>% 
    plotly::layout(
-      xaxis = list(
+      xaxis = base::list(
          title = "<b>Destino</b>"
       ),
-      yaxis = list(
+      yaxis = base::list(
          title = "<b>Tipo</b>"
       )
    ) %>% 
