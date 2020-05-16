@@ -33,11 +33,15 @@ valuebox_icon_otros <- "fas fa-building"
 ## Devuelve la cantidad total de permisos en el año seleccionado por el usuario
 total <- shiny::reactive({
    construccion %>%
+      dplyr::transmute(
+         year,
+         variable = !!rlang::sym(input$variable)
+      ) %>% 
       dplyr::group_by(
          year
       ) %>%
       dplyr::summarise(
-         permisos = base::sum(permisos, na.rm = TRUE)
+         variable = base::sum(variable, na.rm = TRUE)
       ) %>%
       dplyr::filter(
          year == input$year
@@ -48,57 +52,72 @@ total <- shiny::reactive({
 ## Devuelve la cantidad de permisos con destino vivienda en el año seleccionado por el usuario
 vivienda <- shiny::reactive({
    construccion %>%
+      dplyr::transmute(
+         year,
+         destino,
+         variable = !!rlang::sym(input$variable)
+      ) %>% 
       dplyr::group_by(
          year,
          destino
       ) %>%
       dplyr::summarise(
-         permisos = base::sum(permisos, na.rm = TRUE)
+         variable = base::sum(variable, na.rm = TRUE)
       ) %>%
       dplyr::filter(
          year == input$year,
          destino == "Vivienda"
       ) %>%
       dplyr::pull(
-         permisos
+         variable
       )
 })
 
 ## Devuelve la cantidad de permisos con destino comercio en el año seleccionado por el usuario
 comercio <- shiny::reactive({
    construccion %>%
+      dplyr::transmute(
+         year,
+         destino,
+         variable = !!rlang::sym(input$variable)
+      ) %>% 
       dplyr::group_by(
          year,
          destino
       ) %>%
       dplyr::summarise(
-         permisos = base::sum(permisos, na.rm = TRUE)
+         variable = base::sum(variable, na.rm = TRUE)
       ) %>%
       dplyr::filter(
          year == input$year,
          destino == "Comercio"
       ) %>%
       dplyr::pull(
-         permisos
+         variable
       )
 })
 
 ## Devuelve la cantidad de permisos con destino industria en el año seleccionado por el usuario
 industria <- shiny::reactive({
    construccion %>%
+      dplyr::transmute(
+         year,
+         destino,
+         variable = !!rlang::sym(input$variable)
+      ) %>% 
       dplyr::group_by(
          year,
          destino
       ) %>%
       dplyr::summarise(
-         permisos = base::sum(permisos, na.rm = TRUE)
+         variable = base::sum(variable, na.rm = TRUE)
       ) %>%
       dplyr::filter(
          year == input$year,
          destino == "Industria"
       ) %>%
       dplyr::pull(
-         permisos
+         variable
       )
 })
 ```
@@ -113,7 +132,19 @@ shiny::selectInput(
    inputId = "year",
    label = "Seleccione un año",
    selected = base::max(construccion$year),
-   choices = base::sort(base::unique(construccion$year), decreasing = TRUE)
+   choices = base::sort(base::unique(construccion$year), decreasing = TRUE),
+   multiple = FALSE
+)
+
+shiny::selectInput(
+   inputId = "variable",
+   label = "Seleccione una variable",
+   selected = "permisos",
+   choices = base::c(
+      "Permisos" = "permisos",
+      "Superficie (m2)" = "superficie"
+   ),
+   multiple = FALSE
 )
 ```
 
@@ -122,7 +153,7 @@ Fuente: Instituto Nacional de Estadística.
 Row {data-width=100}
 -----------------------------------------------------------------------
 
-### Total de permisos
+### Total
 
 ```{r}
 flexdashboard::renderValueBox({
@@ -198,47 +229,53 @@ Row {data-width=450}
 ```{r}
 plotly::renderPlotly({
    construccion %>% 
-   dplyr::filter(
-      year == input$year
-   ) %>% 
-   dplyr::mutate(
-      proporcion = permisos / base::sum(permisos, na.rm = TRUE) * 100
-   ) %>% 
-   plotly::plot_ly() %>% 
-   plotly::add_trace(
-      x = ~destino,
-      y = ~tipo,
-      type = "scatter",
-      mode = "markers",
-      marker = base::list(
-         size = ~proporcion
-      ),
-      hovertemplate = ~base::paste0(
-         "<b>Tipo</b>: %{y}",
-         "<br>",
-         "<b>Destino</b>: %{x}",
-         "<br>",
-         "<b>Permisos</b>: ",
-         formattable::comma(
-            x = permisos,
-            digits = digits_permisos,
-            big.mark = big_mark,
-            decimal.mark = decimal_mark
+      dplyr::transmute(
+         year,
+         tipo,
+         destino,
+         variable = !!rlang::sym(input$variable)
+      ) %>% 
+      dplyr::filter(
+         year == input$year
+      ) %>% 
+      dplyr::mutate(
+         proporcion = variable / base::sum(variable, na.rm = TRUE) * 100
+      ) %>% 
+      plotly::plot_ly() %>% 
+      plotly::add_trace(
+         x = ~destino,
+         y = ~tipo,
+         type = "scatter",
+         mode = "markers",
+         marker = base::list(
+            size = ~proporcion
+         ),
+         hovertemplate = ~base::paste0(
+            "<b>Tipo</b>: %{y}",
+            "<br>",
+            "<b>Destino</b>: %{x}",
+            "<br>",
+            base::paste0("<b>", stringr::str_to_sentence(input$variable), "</b>: "),
+            formattable::comma(
+               x = variable,
+               digits = digits_permisos,
+               big.mark = big_mark,
+               decimal.mark = decimal_mark
+            )
+         ),
+         name = " "
+      ) %>% 
+      plotly::layout(
+         xaxis = base::list(
+            title = "<b>Destino</b>"
+         ),
+         yaxis = base::list(
+            title = "<b>Tipo</b>"
          )
-      ),
-      name = " "
-   ) %>% 
-   plotly::layout(
-      xaxis = base::list(
-         title = "<b>Destino</b>"
-      ),
-      yaxis = base::list(
-         title = "<b>Tipo</b>"
+      ) %>% 
+      plotly::config(
+         locale = "es",
+         displayModeBar = FALSE
       )
-   ) %>% 
-   plotly::config(
-      locale = "es",
-      displayModeBar = FALSE
-   )
 })
 ```
