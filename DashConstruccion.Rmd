@@ -4,7 +4,7 @@ output:
   flexdashboard::flex_dashboard:
     orientation: rows
     vertical_layout: fill
-    source_code: "https://github.com/daczarne/AppConstruccion"
+    # source_code: "https://github.com/daczarne/AppConstruccion"
 runtime: shiny
 ---
 
@@ -122,7 +122,7 @@ industria <- shiny::reactive({
 })
 ```
 
-Column {.sidebar}
+Controles {.sidebar}
 -----------------------------------------------------------------------
 
 Cantidad de permisos de construcción emitidos por la IMM. Los datos se muestran con apertura por Tipo de permiso y destino del inmueble. El Tipo IPH equivale a Incorporación a Propiedad Horizontal.
@@ -149,6 +149,18 @@ shiny::selectInput(
 ```
 
 Fuente: Instituto Nacional de Estadística.
+
+```{r}
+shiny::HTML(
+   '<a href="https://danielczarnievicz.netlify.app/portfolio/construcci%C3%B3n-en-montevideo/"><i class="fas fa-arrow-circle-left"></i></a>&nbsp;
+   <a href="https://github.com/daczarne/AppConstruccion"><i class="fab fa-github"></i></a>&nbsp;
+   <a href="https://stackoverflow.com/users/5908830/daniel?tab=profile"><i class="fab fa-stack-overflow"></i></a>&nbsp;
+   <a href="https://twitter.com/daczarne"><i class="fab fa-twitter"></i></a>&nbsp;
+   <a href="https://www.linkedin.com/in/danielczarnievicz/"><i class="fab fa-linkedin"></i></a>&nbsp;
+   <a href="https://danielczarnievicz.netlify.app/portfolio/"><i class="fas fa-home"></i></a>&nbsp;'
+)
+```
+
 
 Row {data-width=100}
 -----------------------------------------------------------------------

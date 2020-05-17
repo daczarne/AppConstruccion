@@ -5,8 +5,8 @@ account: daczarne
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
 appId: 2098642
-bundleId: 3155832
+bundleId: 3158898
 url: https://daczarne.shinyapps.io/DashConstruccion/
-when: 1589654363.2201
+when: 1589746007.20682
 asMultiple: FALSE
 asStatic: FALSE
