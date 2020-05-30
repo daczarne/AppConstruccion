@@ -125,7 +125,7 @@ industria <- shiny::reactive({
 Controles {.sidebar}
 -----------------------------------------------------------------------
 
-Cantidad de permisos de construcción emitidos por la IMM. Los datos se muestran con apertura por Tipo de permiso y destino del inmueble. El Tipo IPH equivale a Incorporación a Propiedad Horizontal.
+Permisos de construcción emitidos por la IMM. Los datos se muestran con apertura por Tipo de permiso o por Destino del inmueble. El Tipo IPH equivale a Incorporación a Propiedad Horizontal.
 
 ```{r}
 shiny::selectInput(
